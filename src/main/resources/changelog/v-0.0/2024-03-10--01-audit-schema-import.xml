@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <preConditions>
+        <or>
+            <runningAs username="server"/>
+            <runningAs username="SA"/>
+        </or>
+    </preConditions>
+
+    <changeSet id="http_audit-table" author="panart">
+        <createTable tableName="http_audit">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="method" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uri" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="principal" type="varchar(50)"/>
+            <column name="status" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="websocket_audit-table" author="panart">
+        <createTable tableName="websocket_audit">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="session" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="principal" type="varchar(50)"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

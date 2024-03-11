@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <preConditions>
+        <or>
+            <runningAs username="server"/>
+            <runningAs username="SA"/>
+        </or>
+    </preConditions>
+
+    <include file="2024-03-09--01-authentication-schema-import.xml" relativeToChangelogFile="true"/>
+    <include file="2024-03-10--01-audit-schema-import.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

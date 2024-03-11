@@ -1,0 +1,33 @@
+app:
+  resource-service:
+    albums-url: https://jsonplaceholder.typicode.com/albums
+    posts-url: https://jsonplaceholder.typicode.com/posts
+    users-url: https://jsonplaceholder.typicode.com/users
+  echo-service:
+    url: wss://echo.websocket.org
+    wait-timeout: 200
+
+spring:
+  liquibase:
+    change-log: classpath:changelog/changelog-root.xml
+  datasource:
+    url: jdbc:h2:mem:maindb
+    username: server
+    password: password
+    driver-class-name: org.h2.Driver
+    hikari:
+      connection-timeout: 3000
+      maxLifetime: 600000
+  h2:
+    console:
+      enabled: true
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: httpexchanges,websocketexchanges
