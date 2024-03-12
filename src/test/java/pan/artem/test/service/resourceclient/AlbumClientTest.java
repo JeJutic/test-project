@@ -10,8 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import pan.artem.test.dto.album.AlbumCreateDto;
 import pan.artem.test.dto.album.AlbumDto;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +28,7 @@ class AlbumClientTest {
 
     @Test
     void getAll() {
-        when(restTemplate.getForObject(eq("/"), any()))
+        when(restTemplate.getForObject(any(String.class), any()))
                 .thenReturn(new AlbumDto[]{});
 
         albumClient.getAll();
@@ -64,7 +63,7 @@ class AlbumClientTest {
 
     @Test
     void update() {
-        when(restTemplate.exchange(any(), any(), any(), eq(AlbumDto.class), eq(42)))
+        when(restTemplate.exchange(any(), any(), any(), eq(AlbumDto.class), anyInt()))
                 .thenReturn(ResponseEntity.ok(null));
 
         albumClient.update(42, album1);

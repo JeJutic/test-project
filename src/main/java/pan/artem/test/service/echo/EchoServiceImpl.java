@@ -4,11 +4,10 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import pan.artem.test.exception.websocket.WaitResponseException;
 import pan.artem.test.properties.AppProperties;
 
@@ -33,10 +32,10 @@ public class EchoServiceImpl implements EchoService {
         this.waitTimeout = properties.getWaitTimeout();
     }
 
-    private static class ClientWebSocketHandler extends TextWebSocketHandler {
+    private static class ClientWebSocketHandler extends AbstractWebSocketHandler {
         private WebSocketSession session;
         @Setter
-        private Consumer<TextMessage> onRecieve;
+        private Consumer<WebSocketMessage<?>> onRecieve;
 
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
@@ -53,7 +52,7 @@ public class EchoServiceImpl implements EchoService {
         // This class isn't protected against concurrent access as long as
         // WebSocketHandler#handleMessage for each connection called in the same thread
         @Override
-        protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
             if (onRecieve != null) {
                 onRecieve.accept(message);
                 onRecieve = null;
@@ -70,8 +69,8 @@ public class EchoServiceImpl implements EchoService {
         proxySessionHandler.put(sessionId, handler);
     }
 
-    private CompletableFuture<WebSocketMessage<?>> innerHandleTextMessage(
-            String sessionId, TextMessage message
+    private CompletableFuture<WebSocketMessage<?>> innerHandleMessage(
+            String sessionId, WebSocketMessage<?> message
     ) throws IOException {
         var handler = proxySessionHandler.get(sessionId);
 
@@ -83,13 +82,13 @@ public class EchoServiceImpl implements EchoService {
     }
 
     @Override
-    public WebSocketMessage<?> handleTextMessage(
-            String sessionId, TextMessage message
+    public WebSocketMessage<?> handleMessage(
+            String sessionId, WebSocketMessage<?> message
     ) throws IOException, WaitResponseException {
         logger.debug("Received {} on session {}", message, sessionId);
 
         try {
-            return innerHandleTextMessage(sessionId, message)
+            return innerHandleMessage(sessionId, message)
                     .get(waitTimeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new WaitResponseException(e);

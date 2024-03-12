@@ -6,8 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import pan.artem.test.ApplicationUtil;
 import pan.artem.test.entity.audit.WebSocketAudit;
 import pan.artem.test.exception.websocket.WaitResponseException;
@@ -19,7 +20,7 @@ import java.time.Instant;
 
 @Controller
 @AllArgsConstructor
-public class EchoHandler extends TextWebSocketHandler {
+public class EchoHandler extends AbstractWebSocketHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final EchoService echoService;
@@ -43,11 +44,11 @@ public class EchoHandler extends TextWebSocketHandler {
     }
 
     @Override
-    protected void handleTextMessage(
-            WebSocketSession session, TextMessage message
+    public void handleMessage(
+            WebSocketSession session, WebSocketMessage<?> message
     ) throws IOException {
         try {
-            var response = echoService.handleTextMessage(session.getId(), message);
+            var response = echoService.handleMessage(session.getId(), message);
             session.sendMessage(response);
         } catch (WaitResponseException e) {
             logger.warn("Couldn't get response from echo server on {} session", session, e);
